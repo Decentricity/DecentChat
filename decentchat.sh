@@ -98,7 +98,7 @@ def get_messages():
     return jsonify(messages)
 
 if __name__ == '__main__':
-    app.run(port=3690, debug=True)
+    app.run(port=3666, debug=True)
 EOL
 fi
 
@@ -108,4 +108,4 @@ python3 app.py &
 
 # Forward local server to the Internet using localhost.run
 echo "Setting up localhost.run tunnel..."
-ssh -R 80:localhost:3690 ssh.localhost.run
+ssh -R 80:localhost:3666 ssh.localhost.run
