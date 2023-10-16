@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Generate a random port between 3000 and 3999
+RANDOM_PORT=$((3000 + RANDOM % 1000))
+
 # Check if SSH is installed
 if ! command -v ssh &> /dev/null; then
     echo "SSH is not installed. Installing..."
@@ -26,10 +29,12 @@ fi
 # Check if app.py exists, if not create it
 if [ ! -f "app.py" ]; then
     echo "Creating app.py..."
-    cat <<EOL > app.py
-from flask import Flask, render_template_string, request, redirect, url_for
+    cat <<EOL > temp_app.py
+from flask import Flask, render_template_string, request, redirect, url_for, session
+import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 messages = []
 
 CHAT_HTML = '''
@@ -69,8 +74,11 @@ def send_message():
     return redirect(url_for('chat_room'))
 
 if __name__ == '__main__':
-    app.run(port=3693, debug=True)
+    app.run(port=PORT_TO_BE_REPLACED, debug=True)
 EOL
+    # Replace placeholder with actual port number
+    sed "s/PORT_TO_BE_REPLACED/$RANDOM_PORT/g" temp_app.py > app.py
+    rm temp_app.py
 fi
 
 # Start Flask app
