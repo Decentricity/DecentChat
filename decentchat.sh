@@ -26,7 +26,7 @@ fi
 # Check if app.py exists, if not create it
 if [ ! -f "app.py" ]; then
     echo "Creating app.py..."
-    cat <<EOL > app.py
+    cat <<'EOL' > app.py
 from flask import Flask, render_template_string, request, jsonify
 
 app = Flask(__name__)
@@ -37,26 +37,26 @@ CHAT_HTML = '''
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Decentricity's Anonymous Chat Room</title>
+    <title>Decentricity\'s Anonymous Chat Room</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function refreshChat() {
-            $.getJSON("/messages", function(data) {
+            \$.getJSON("/messages", function(data) {
                 let chatList = "";
                 data.messages.forEach(function(message) {
                     chatList += "<li><strong>" + message.user_id + "</strong>: " + message.message + "</li>";
                 });
-                $("#chat-list").html(chatList);
+                \$("#chat-list").html(chatList);
             });
         }
 
-        $(document).ready(function() {
+        \$(document).ready(function() {
             refreshChat();
-            $("#send-button").click(function() {
-                let username = $("#username").val().trim() || "Anon";
-                let message = $("#message").val().trim();
-                $.post("/send", { "username": username, "message": message }, function() {
-                    $("#message").val("");
+            \$("#send-button").click(function() {
+                let username = \$("#username").val().trim() || "Anon";
+                let message = \$("#message").val().trim();
+                \$.post("/send", { "username": username, "message": message }, function() {
+                    \$("#message").val("");
                     refreshChat();
                 });
             });
@@ -64,7 +64,7 @@ CHAT_HTML = '''
     </script>
 </head>
 <body>
-    <h1>DecentChat, the Anonymous Sovereign Chat Room</h1>
+    <h1>Welcome to the Anonymous Chat Room!</h1>
     <ul id="chat-list"></ul>
     <input id="username" type="text" placeholder="Your Username" autocomplete="off">
     <input id="message" type="text" placeholder="Your Message" autocomplete="off">
@@ -79,7 +79,9 @@ def chat_room():
 
 @app.route('/send', methods=['POST'])
 def send_message():
-    username = request.form.get('username', 'Anon').strip() || "Anon"
+    username = request.form.get('username', 'Anon').strip()
+    if not username:
+        username = 'Anon'
     message = request.form['message'].strip()
     messages.append({"user_id": username, "message": message})
     return jsonify({"status": "ok"})
