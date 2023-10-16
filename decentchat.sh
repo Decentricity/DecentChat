@@ -69,7 +69,7 @@ def send_message():
     return redirect(url_for('chat_room'))
 
 if __name__ == '__main__':
-    app.run(port=3000, debug=True)
+    app.run(port=3693, debug=True)
 EOL
 fi
 
@@ -79,4 +79,4 @@ python3 app.py &
 
 # Forward local server to the Internet using localhost.run
 echo "Setting up localhost.run tunnel..."
-ssh -R 80:localhost:3000 ssh.localhost.run
+ssh -R 80:localhost:3693 ssh.localhost.run
