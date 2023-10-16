@@ -43,23 +43,21 @@ CHAT_HTML = '''<!DOCTYPE html>
     <script>
         function refreshChat() {
             $.getJSON("/messages", function(data) {
-            var chatList = $("#chat-list");
-            if (chatList.length > 0) {
-                chatList.empty();
-                data.forEach(function(msg) {
-                    chatList.append('<li><strong>' + msg.user_id + '</strong>: ' + msg.message + '</li>');
+                var chatList = $("#chat-list");
+                if (chatList.length > 0) {
+                    chatList.empty();
+                    data.forEach(function(msg) {
+                        chatList.append('<li><strong>' + msg.user_id + '</strong>: ' + msg.message + '</li>');
+                    });
+                }
             });
         }
-    });
-}
-
 
         $(document).ready(function() {
             $("#send-button").click(function(e) {
                 e.preventDefault();
                 const username = $("#username").val() || "Anon";
                 const message = $("#message").val();
-
                 $.post("/send", { username: username, message: message }, function() {
                     $("#message").val("");
                     refreshChat();
@@ -73,8 +71,7 @@ CHAT_HTML = '''<!DOCTYPE html>
 </head>
 <body>
     <h1>Welcome to the Anonymous Chat Room!</h1>
-    <ul id="chat-list">
-    </ul>
+    <ul id="chat-list"></ul>
     <form>
         <input id="username" name="username" placeholder="Username" autocomplete="off">
         <input id="message" name="message" placeholder="Message" autocomplete="off">
@@ -82,6 +79,7 @@ CHAT_HTML = '''<!DOCTYPE html>
     </form>
 </body>
 </html>'''
+
 
 @app.route('/')
 def chat_room():
