@@ -27,12 +27,13 @@ fi
 if [ ! -f "app.py" ]; then
     echo "Creating app.py..."
     cat <<EOL > app.py
-from flask import Flask, render_template_string, request, redirect, url_for
+from flask import Flask, render_template_string, request, redirect, url_for, session
 import random
+import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 messages = []
-user_ids = {}
 
 CHAT_HTML = '''
 <!DOCTYPE html>
@@ -58,17 +59,14 @@ CHAT_HTML = '''
 
 @app.route('/')
 def chat_room():
+    if 'user_id' not in session:
+        session['user_id'] = str(random.randint(1000000, 9999999))
     return render_template_string(CHAT_HTML, messages=messages)
 
 @app.route('/send', methods=['POST'])
 def send_message():
     message = request.form['message']
-    ip_address = request.remote_addr
-
-    if ip_address not in user_ids:
-        user_ids[ip_address] = random.randint(1000000, 9999999)
-
-    messages.append({"user_id": user_ids[ip_address], "message": message})
+    messages.append({"user_id": session['user_id'], "message": message})
     return redirect(url_for('chat_room'))
 
 if __name__ == '__main__':
