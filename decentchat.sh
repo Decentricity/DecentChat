@@ -82,9 +82,9 @@ EOL
 fi
 
 # Start Flask app
-echo "Starting Flask app..."
+echo "Starting Flask app on port $RANDOM_PORT..."
 python3 app.py &
 
 # Forward local server to the Internet using localhost.run
-echo "Setting up localhost.run tunnel..."
-ssh -R 80:localhost:3693 ssh.localhost.run
+echo "Setting up localhost.run tunnel on port $RANDOM_PORT..."
+ssh -R 80:localhost:$RANDOM_PORT ssh.localhost.run
