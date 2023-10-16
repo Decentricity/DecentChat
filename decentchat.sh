@@ -26,6 +26,9 @@ if ! command -v flask &> /dev/null; then
     pip3 install Flask
 fi
 
+# Kill any existing instances of the Flask app
+pkill -f "python3 app.py"
+
 # Check if app.py exists, if not create it
 if [ ! -f "app.py" ]; then
     echo "Creating app.py..."
@@ -88,3 +91,4 @@ python3 app.py &
 # Forward local server to the Internet using localhost.run
 echo "Setting up localhost.run tunnel on port $RANDOM_PORT..."
 ssh -R 80:localhost:$RANDOM_PORT ssh.localhost.run
+
