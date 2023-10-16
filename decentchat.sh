@@ -26,79 +26,50 @@ fi
 # Check if app.py exists, if not create it
 if [ ! -f "app.py" ]; then
     echo "Creating app.py..."
-    #!/bin/bash
     cat <<EOL > app.py
-from flask import Flask, render_template_string, request, redirect, url_for, jsonify
-import random
+from flask import Flask, render_template_string, request, redirect, url_for
 
 app = Flask(__name__)
 messages = []
 
-CHAT_HTML = '''<!DOCTYPE html>
+CHAT_HTML = '''
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Decentricity's Anonymous Chat Room</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function refreshChat() {
-            $.getJSON("/messages", function(data) {
-                var chatList = $("#chat-list");
-                if (chatList.length > 0) {
-                    chatList.empty();
-                    data.forEach(function(msg) {
-                        chatList.append('<li><strong>' + msg.user_id + '</strong>: ' + msg.message + '</li>');
-                    });
-                }
-            });
-        }
-
-        $(document).ready(function() {
-            $("#send-button").click(function(e) {
-                e.preventDefault();
-                const username = $("#username").val() || "Anon";
-                const message = $("#message").val();
-                $.post("/send", { username: username, message: message }, function() {
-                    $("#message").val("");
-                    refreshChat();
-                });
-            });
-
-            refreshChat();
-            setInterval(refreshChat, 2000);
-        });
-    </script>
 </head>
 <body>
     <h1>Welcome to the Anonymous Chat Room!</h1>
-    <ul id="chat-list"></ul>
-    <form>
-        <input id="username" name="username" placeholder="Username" autocomplete="off">
-        <input id="message" name="message" placeholder="Message" autocomplete="off">
-        <button id="send-button" type="submit">Send</button>
+    <ul>
+        {% for message in messages %}
+            <li><strong>{{ message.user_id }}</strong>: {{ message.message }}</li>
+        {% endfor %}
+    </ul>
+    <form method="post" action="/send">
+        <input name="username" placeholder="Your Username" autocomplete="off">
+        <input name="message" placeholder="Your Message" autocomplete="off">
+        <button type="submit">Send</button>
     </form>
 </body>
-</html>'''
-
+</html>
+'''
 
 @app.route('/')
 def chat_room():
-    return CHAT_HTML
+    return render_template_string(CHAT_HTML, messages=messages)
 
 @app.route('/send', methods=['POST'])
 def send_message():
-    username = request.form.get('username', 'Anon').strip() or "Anon"
-    message = request.form.get('message').strip()
+    username = request.form.get('username', 'Anon').strip()
+    message = request.form['message']
+    username = "Anon" if username == "" else username
 
     messages.append({"user_id": username, "message": message})
-    return jsonify(success=True)
-
-@app.route('/messages')
-def get_messages():
-    return jsonify(messages)
+    return redirect(url_for('chat_room'))
 
 if __name__ == '__main__':
-    app.run(port=3666, debug=True)
+    app.run(port=3000, debug=True)
 EOL
 fi
 
@@ -108,4 +79,4 @@ python3 app.py &
 
 # Forward local server to the Internet using localhost.run
 echo "Setting up localhost.run tunnel..."
-ssh -R 80:localhost:3666 ssh.localhost.run
+ssh -R 80:localhost:3000 ssh.localhost.run
