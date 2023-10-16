@@ -27,12 +27,9 @@ fi
 if [ ! -f "app.py" ]; then
     echo "Creating app.py..."
     cat <<EOL > app.py
-from flask import Flask, render_template_string, request, redirect, url_for, session
-import random
-import os
+from flask import Flask, render_template_string, request, redirect, url_for
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
 messages = []
 
 CHAT_HTML = '''
@@ -50,7 +47,8 @@ CHAT_HTML = '''
         {% endfor %}
     </ul>
     <form method="post" action="/send">
-        <input name="message" autocomplete="off">
+        <input name="username" placeholder="Your Username" autocomplete="off">
+        <input name="message" placeholder="Your Message" autocomplete="off">
         <button type="submit">Send</button>
     </form>
 </body>
@@ -59,18 +57,19 @@ CHAT_HTML = '''
 
 @app.route('/')
 def chat_room():
-    if 'user_id' not in session:
-        session['user_id'] = str(random.randint(1000000, 9999999))
     return render_template_string(CHAT_HTML, messages=messages)
 
 @app.route('/send', methods=['POST'])
 def send_message():
+    username = request.form.get('username', 'Anon').strip()
     message = request.form['message']
-    messages.append({"user_id": session['user_id'], "message": message})
+    username = "Anon" if username == "" else username
+
+    messages.append({"user_id": username, "message": message})
     return redirect(url_for('chat_room'))
 
 if __name__ == '__main__':
-    app.run(port=3000, debug=True)
+    app.run(port=3690, debug=True)
 EOL
 fi
 
@@ -80,4 +79,4 @@ python3 app.py &
 
 # Forward local server to the Internet using localhost.run
 echo "Setting up localhost.run tunnel..."
-ssh -R 80:localhost:3000 ssh.localhost.run
+ssh -R 80:localhost:3690 ssh.localhost.run
