@@ -43,12 +43,16 @@ CHAT_HTML = '''<!DOCTYPE html>
     <script>
         function refreshChat() {
             $.getJSON("/messages", function(data) {
-                $("#chat-list").empty();
+            var chatList = $("#chat-list");
+            if (chatList.length > 0) {
+                chatList.empty();
                 data.forEach(function(msg) {
-                    $("#chat-list").append('<li><strong>' + msg.user_id + '</strong>: ' + msg.message + '</li>');
-                });
+                    chatList.append('<li><strong>' + msg.user_id + '</strong>: ' + msg.message + '</li>');
             });
         }
+    });
+}
+
 
         $(document).ready(function() {
             $("#send-button").click(function(e) {
